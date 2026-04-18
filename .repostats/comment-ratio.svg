@@ -19,13 +19,13 @@
     <g transform="translate(177.5, 0)">
       <g>
     <path d="M 18.180194846605353 81.81980515339464 A 45 45 0 1 1 81.81980515339464 81.81980515339464" fill="none" stroke="#30363d" stroke-width="10" stroke-linecap="round" />
-    <path d="M 18.180194846605353 81.81980515339464 A 45 45 0 0 1 16.072972234420547 79.5627601382821" fill="none" stroke="#f85149" stroke-width="10" stroke-linecap="round" />
+    <path d="M 18.180194846605353 81.81980515339464 A 45 45 0 0 1 13.723202847224982 76.6269410247669" fill="none" stroke="#f85149" stroke-width="10" stroke-linecap="round" />
   </g>
-      <text x="50" y="55" text-anchor="middle" font-family="'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700" fill="#c9d1d9">1%</text>
+      <text x="50" y="55" text-anchor="middle" font-family="'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700" fill="#c9d1d9">3%</text>
       <text x="50" y="72" text-anchor="middle" font-family="'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif" font-size="10" fill="#8b949e">Sparse</text>
     </g>
     <g transform="translate(0, 108)">
-      <text class="card-text-secondary" x="227.5" y="0" text-anchor="middle">Code: 4.8K • Comments: 71</text>
+      <text class="card-text-secondary" x="227.5" y="0" text-anchor="middle">Code: 2.1K • Comments: 71</text>
     </g>
   
   </g>

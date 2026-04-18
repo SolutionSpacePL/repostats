@@ -16,23 +16,23 @@
   <line x1="20" y1="36" x2="475" y2="36" stroke="#30363d" stroke-width="0.5" />
   <g transform="translate(20, 48)">
     
-    <text class="card-text" x="0" y="4" font-size="20" font-weight="700" fill="#c9d1d9">5.3K</text>
+    <text class="card-text" x="0" y="4" font-size="20" font-weight="700" fill="#c9d1d9">2.6K</text>
     <text class="card-text-secondary" x="0" y="22">total lines</text>
     <g transform="translate(0, 36)">
       <g>
   <defs><clipPath id="bar-clip-0"><rect width="455" height="12" rx="4" /></clipPath></defs>
-  <g clip-path="url(#bar-clip-0)"><rect x="0" y="0" width="413.51116155883466" height="12" fill="#58a6ff" />
-<rect x="413.51116155883466" y="0" width="6.111426409383276" height="12" fill="#3fb950" />
-<rect x="419.62258796821794" y="0" width="35.377412031782065" height="12" fill="#d29922" /></g>
+  <g clip-path="url(#bar-clip-0)"><rect x="0" y="0" width="370.7988505747127" height="12" fill="#58a6ff" />
+<rect x="370.7988505747127" y="0" width="12.377394636015325" height="12" fill="#3fb950" />
+<rect x="383.176245210728" y="0" width="71.82375478927203" height="12" fill="#d29922" /></g>
 </g>
     </g>
     <g transform="translate(0, 60)">
       <circle cx="5" cy="5" r="4" fill="#58a6ff" />
-      <text class="card-text-secondary" x="14" y="9">Code 4.8K (91%)</text>
+      <text class="card-text-secondary" x="14" y="9">Code 2.1K (81%)</text>
       <circle cx="156.66666666666666" cy="5" r="4" fill="#3fb950" />
-      <text class="card-text-secondary" x="165.66666666666666" y="9">Comments 71 (1%)</text>
+      <text class="card-text-secondary" x="165.66666666666666" y="9">Comments 71 (3%)</text>
       <circle cx="308.3333333333333" cy="5" r="4" fill="#d29922" />
-      <text class="card-text-secondary" x="317.3333333333333" y="9">Blank 411 (8%)</text>
+      <text class="card-text-secondary" x="317.3333333333333" y="9">Blank 412 (16%)</text>
     </g>
   
   </g>
