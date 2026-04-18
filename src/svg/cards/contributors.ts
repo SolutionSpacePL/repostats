@@ -6,10 +6,9 @@ export function renderContributors(data: CollectedData, config: RepoStatsConfig,
   if (!contributors || contributors.length === 0) return null;
 
   const rowHeight = 32;
-  const maxShow = Math.min(contributors.length, 8);
   const parts: string[] = [];
 
-  for (let i = 0; i < maxShow; i++) {
+  for (let i = 0; i < contributors.length; i++) {
     const c = contributors[i];
     const y = i * rowHeight;
 
@@ -30,7 +29,7 @@ export function renderContributors(data: CollectedData, config: RepoStatsConfig,
   return renderCard({
     title: 'Top Contributors',
     width: config.cardWidth,
-    height: maxShow * rowHeight + 4,
+    height: contributors.length * rowHeight + 4,
     body: parts.join(''),
     theme,
   });

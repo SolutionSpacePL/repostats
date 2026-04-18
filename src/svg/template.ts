@@ -14,7 +14,10 @@ export function renderCard({ title, width, height, body, theme, icon }: CardOpti
   const padding = 20;
   const totalHeight = height + titleBarHeight + padding;
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${totalHeight}" viewBox="0 0 ${width} ${totalHeight}" fill="none">
+  const titleId = `repostats-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${totalHeight}" viewBox="0 0 ${width} ${totalHeight}" fill="none" role="img" aria-labelledby="${titleId}">
+  <title id="${titleId}">${escapeXml(title)}</title>
   <style>
     .card-bg { fill: ${theme.bg}; }
     .card-border { stroke: ${theme.border}; stroke-width: 1; fill: none; }

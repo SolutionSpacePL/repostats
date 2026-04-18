@@ -1,5 +1,6 @@
 import { FileInfo, FileVisitor } from '../utils/fs';
 import { getLangInfo } from '../utils/lang-map';
+import { countLines } from '../utils/comments';
 import { LocResult } from '../types';
 
 let result: LocResult;
@@ -16,51 +17,15 @@ function createVisitor(): FileVisitor {
         result.byLanguage[langName] = { code: 0, comments: 0, blanks: 0 };
       }
 
-      let inBlockComment = false;
-      const blockStart = lang?.blockCommentStart;
-      const blockEnd = lang?.blockCommentEnd;
-      const lineComment = lang?.lineComment;
+      const counts = countLines(file.lines, lang);
 
-      for (const line of file.lines) {
-        const trimmed = line.trim();
-        result.total++;
-
-        if (trimmed === '') {
-          result.blanks++;
-          result.byLanguage[langName].blanks++;
-          continue;
-        }
-
-        // Block comment handling
-        if (inBlockComment) {
-          result.comments++;
-          result.byLanguage[langName].comments++;
-          if (blockEnd && trimmed.includes(blockEnd)) {
-            inBlockComment = false;
-          }
-          continue;
-        }
-
-        if (blockStart && trimmed.startsWith(blockStart)) {
-          result.comments++;
-          result.byLanguage[langName].comments++;
-          if (blockEnd && !trimmed.includes(blockEnd)) {
-            inBlockComment = true;
-          }
-          continue;
-        }
-
-        // Line comment
-        if (lineComment && trimmed.startsWith(lineComment)) {
-          result.comments++;
-          result.byLanguage[langName].comments++;
-          continue;
-        }
-
-        // Code line
-        result.code++;
-        result.byLanguage[langName].code++;
-      }
+      result.total += counts.code + counts.comments + counts.blanks;
+      result.code += counts.code;
+      result.comments += counts.comments;
+      result.blanks += counts.blanks;
+      result.byLanguage[langName].code += counts.code;
+      result.byLanguage[langName].comments += counts.comments;
+      result.byLanguage[langName].blanks += counts.blanks;
     },
   };
 }

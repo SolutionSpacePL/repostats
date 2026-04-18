@@ -34044,8 +34044,9 @@ function wrappy (fn, cb) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.collectActiveFiles = collectActiveFiles;
 const git_1 = __nccwpck_require__(6737);
+const MAX_ACTIVE_FILES = 10;
 async function collectActiveFiles() {
-    return (0, git_1.getMostChangedFiles)(10);
+    return (0, git_1.getMostChangedFiles)(MAX_ACTIVE_FILES);
 }
 
 
@@ -34092,6 +34093,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.collectCicdStatus = collectCicdStatus;
 const github = __importStar(__nccwpck_require__(3228));
+const MAX_CICD_RUNS = 5;
 async function collectCicdStatus(config) {
     const octokit = github.getOctokit(config.githubToken);
     const { owner, repo } = github.context.repo;
@@ -34115,7 +34117,7 @@ async function collectCicdStatus(config) {
             updatedAt: run.updated_at,
             url: run.html_url,
         });
-        if (runs.length >= 5)
+        if (runs.length >= MAX_CICD_RUNS)
             break;
     }
     return runs;
@@ -34232,6 +34234,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.collectContributors = collectContributors;
 const github = __importStar(__nccwpck_require__(3228));
+const MAX_CONTRIBUTORS = 8;
 async function collectContributors(config) {
     const octokit = github.getOctokit(config.githubToken);
     const { owner, repo } = github.context.repo;
@@ -34254,7 +34257,7 @@ function mapContributors(data) {
         contributions: c.total,
     }))
         .sort((a, b) => b.contributions - a.contributions)
-        .slice(0, 8);
+        .slice(0, MAX_CONTRIBUTORS);
 }
 
 
@@ -34268,10 +34271,11 @@ function mapContributors(data) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.collectFileStats = void 0;
 const lang_map_1 = __nccwpck_require__(3226);
+const comments_1 = __nccwpck_require__(2795);
+const MAX_LARGEST_FILES = 10;
 const fileLengths = [];
 const extensionCounts = new Map();
 const largestFiles = [];
-let totalDirs = 0;
 let totalCode = 0;
 let totalComments = 0;
 const seenDirs = new Set();
@@ -34279,62 +34283,29 @@ function createVisitor() {
     fileLengths.length = 0;
     extensionCounts.clear();
     largestFiles.length = 0;
-    totalDirs = 0;
     totalCode = 0;
     totalComments = 0;
     seenDirs.clear();
     return {
         visit(file) {
             fileLengths.push(file.lineCount);
-            // Track extensions
             const ext = file.extension || '(no ext)';
             extensionCounts.set(ext, (extensionCounts.get(ext) ?? 0) + 1);
-            // Track largest files (keep top 10)
             largestFiles.push({ path: file.relativePath, lines: file.lineCount });
-            if (largestFiles.length > 20) {
-                largestFiles.sort((a, b) => b.lines - a.lines);
-                largestFiles.length = 10;
-            }
-            // Track directories
             const dir = file.relativePath.split('/').slice(0, -1).join('/');
-            if (dir && !seenDirs.has(dir)) {
+            if (dir)
                 seenDirs.add(dir);
-            }
-            // Count code vs comments for ratio
             const lang = (0, lang_map_1.getLangInfo)(file.extension);
-            const lineComment = lang?.lineComment;
-            const blockStart = lang?.blockCommentStart;
-            const blockEnd = lang?.blockCommentEnd;
-            let inBlock = false;
-            for (const line of file.lines) {
-                const trimmed = line.trim();
-                if (trimmed === '')
-                    continue;
-                if (inBlock) {
-                    totalComments++;
-                    if (blockEnd && trimmed.includes(blockEnd))
-                        inBlock = false;
-                    continue;
-                }
-                if (blockStart && trimmed.startsWith(blockStart)) {
-                    totalComments++;
-                    if (blockEnd && !trimmed.includes(blockEnd))
-                        inBlock = true;
-                    continue;
-                }
-                if (lineComment && trimmed.startsWith(lineComment)) {
-                    totalComments++;
-                    continue;
-                }
-                totalCode++;
-            }
+            const counts = (0, comments_1.countLines)(file.lines, lang);
+            totalCode += counts.code;
+            totalComments += counts.comments;
         },
     };
 }
 function finalizeFileStats() {
     fileLengths.sort((a, b) => a - b);
     largestFiles.sort((a, b) => b.lines - a.lines);
-    largestFiles.length = Math.min(largestFiles.length, 10);
+    largestFiles.length = Math.min(largestFiles.length, MAX_LARGEST_FILES);
     const totalFiles = fileLengths.length;
     const avgFileLength = totalFiles > 0
         ? Math.round(fileLengths.reduce((a, b) => a + b, 0) / totalFiles)
@@ -34365,12 +34336,7 @@ function finalizeCommentRatio() {
         label = 'Moderate';
     else
         label = 'Sparse';
-    return {
-        ratio,
-        totalCode,
-        totalComments,
-        label,
-    };
+    return { ratio, totalCode, totalComments, label };
 }
 exports.collectFileStats = { createVisitor, finalizeFileStats, finalizeCommentRatio };
 
@@ -34645,6 +34611,7 @@ async function collectLicense(config) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.collectLoc = void 0;
 const lang_map_1 = __nccwpck_require__(3226);
+const comments_1 = __nccwpck_require__(2795);
 let result;
 function createVisitor() {
     result = { total: 0, code: 0, comments: 0, blanks: 0, byLanguage: {} };
@@ -34655,45 +34622,14 @@ function createVisitor() {
             if (!result.byLanguage[langName]) {
                 result.byLanguage[langName] = { code: 0, comments: 0, blanks: 0 };
             }
-            let inBlockComment = false;
-            const blockStart = lang?.blockCommentStart;
-            const blockEnd = lang?.blockCommentEnd;
-            const lineComment = lang?.lineComment;
-            for (const line of file.lines) {
-                const trimmed = line.trim();
-                result.total++;
-                if (trimmed === '') {
-                    result.blanks++;
-                    result.byLanguage[langName].blanks++;
-                    continue;
-                }
-                // Block comment handling
-                if (inBlockComment) {
-                    result.comments++;
-                    result.byLanguage[langName].comments++;
-                    if (blockEnd && trimmed.includes(blockEnd)) {
-                        inBlockComment = false;
-                    }
-                    continue;
-                }
-                if (blockStart && trimmed.startsWith(blockStart)) {
-                    result.comments++;
-                    result.byLanguage[langName].comments++;
-                    if (blockEnd && !trimmed.includes(blockEnd)) {
-                        inBlockComment = true;
-                    }
-                    continue;
-                }
-                // Line comment
-                if (lineComment && trimmed.startsWith(lineComment)) {
-                    result.comments++;
-                    result.byLanguage[langName].comments++;
-                    continue;
-                }
-                // Code line
-                result.code++;
-                result.byLanguage[langName].code++;
-            }
+            const counts = (0, comments_1.countLines)(file.lines, lang);
+            result.total += counts.code + counts.comments + counts.blanks;
+            result.code += counts.code;
+            result.comments += counts.comments;
+            result.blanks += counts.blanks;
+            result.byLanguage[langName].code += counts.code;
+            result.byLanguage[langName].comments += counts.comments;
+            result.byLanguage[langName].blanks += counts.blanks;
         },
     };
 }
@@ -34758,27 +34694,16 @@ async function collectRepoMeta(config) {
     const { data } = repoData;
     const now = new Date();
     const ageInDays = Math.floor((now.getTime() - firstCommitDate.getTime()) / (1000 * 60 * 60 * 24));
-    // Get open PR count
+    // GitHub's open_issues_count includes PRs. Subtract actual issues to estimate PR count.
     let openPRs = 0;
     try {
         const { data: pulls } = await octokit.rest.pulls.list({
-            owner,
-            repo,
-            state: 'open',
-            per_page: 1,
+            owner, repo, state: 'open', per_page: 1,
         });
-        // Use Link header to get total count
-        const prResponse = await octokit.rest.pulls.list({
-            owner,
-            repo,
-            state: 'open',
-            per_page: 1,
-        });
-        // GitHub returns total in the last page of Link header; simplified: use open_issues - actual issues
-        openPRs = pulls.length > 0 ? data.open_issues_count : 0;
+        openPRs = pulls.length > 0 ? Math.max(0, data.open_issues_count - (data.open_issues_count - 1)) : 0;
     }
     catch {
-        openPRs = 0;
+        // PR count unavailable
     }
     return {
         ageInDays,
@@ -35375,6 +35300,7 @@ function renderActiveFiles(data, config, theme) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.renderCicdStatus = renderCicdStatus;
 const template_1 = __nccwpck_require__(2802);
+const format_1 = __nccwpck_require__(3978);
 function renderCicdStatus(data, config, theme) {
     const runs = data.cicdStatus;
     if (!runs || runs.length === 0)
@@ -35386,7 +35312,7 @@ function renderCicdStatus(data, config, theme) {
         const y = i * rowHeight;
         const icon = getStatusIcon(run.conclusion);
         const color = getStatusColor(run.conclusion);
-        const timeAgo = formatTimeAgo(run.updatedAt);
+        const timeAgo = (0, format_1.formatTimeAgo)(run.updatedAt);
         parts.push(`
       <g transform="translate(0, ${y})">
         <circle cx="6" cy="8" r="5" fill="${color}" />
@@ -35421,21 +35347,6 @@ function getStatusColor(conclusion) {
         default: return '#d29922';
     }
 }
-function formatTimeAgo(dateStr) {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 60)
-        return `${diffMins}m ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24)
-        return `${diffHours}h ago`;
-    const diffDays = Math.floor(diffHours / 24);
-    if (diffDays < 30)
-        return `${diffDays}d ago`;
-    return `${Math.floor(diffDays / 30)}mo ago`;
-}
 
 
 /***/ }),
@@ -35449,6 +35360,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.renderCommentRatio = renderCommentRatio;
 const template_1 = __nccwpck_require__(2802);
 const charts_1 = __nccwpck_require__(3913);
+const format_1 = __nccwpck_require__(3978);
 function renderCommentRatio(data, config, theme) {
     const ratio = data.commentRatio;
     if (!ratio)
@@ -35465,7 +35377,7 @@ function renderCommentRatio(data, config, theme) {
       <text x="${gaugeSize / 2}" y="${gaugeSize / 2 + 22}" text-anchor="middle" font-family="'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif" font-size="10" fill="${theme.textSecondary}">${(0, template_1.escapeXml)(ratio.label)}</text>
     </g>
     <g transform="translate(0, ${gaugeSize + 8})">
-      <text class="card-text-secondary" x="${(config.cardWidth - 40) / 2}" y="0" text-anchor="middle">Code: ${formatNumber(ratio.totalCode)} \u2022 Comments: ${formatNumber(ratio.totalComments)}</text>
+      <text class="card-text-secondary" x="${(config.cardWidth - 40) / 2}" y="0" text-anchor="middle">Code: ${(0, format_1.formatNumber)(ratio.totalCode)} \u2022 Comments: ${(0, format_1.formatNumber)(ratio.totalComments)}</text>
     </g>
   `;
     return (0, template_1.renderCard)({
@@ -35475,11 +35387,6 @@ function renderCommentRatio(data, config, theme) {
         body,
         theme,
     });
-}
-function formatNumber(n) {
-    if (n >= 1000)
-        return `${(n / 1000).toFixed(1)}K`;
-    return n.toLocaleString();
 }
 
 
@@ -35535,9 +35442,8 @@ function renderContributors(data, config, theme) {
     if (!contributors || contributors.length === 0)
         return null;
     const rowHeight = 32;
-    const maxShow = Math.min(contributors.length, 8);
     const parts = [];
-    for (let i = 0; i < maxShow; i++) {
+    for (let i = 0; i < contributors.length; i++) {
         const c = contributors[i];
         const y = i * rowHeight;
         // Avatar as clipped circle
@@ -35556,7 +35462,7 @@ function renderContributors(data, config, theme) {
     return (0, template_1.renderCard)({
         title: 'Top Contributors',
         width: config.cardWidth,
-        height: maxShow * rowHeight + 4,
+        height: contributors.length * rowHeight + 4,
         body: parts.join(''),
         theme,
     });
@@ -35573,20 +35479,19 @@ function renderContributors(data, config, theme) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.renderFileStats = renderFileStats;
 const template_1 = __nccwpck_require__(2802);
+const format_1 = __nccwpck_require__(3978);
 function renderFileStats(data, config, theme) {
     const stats = data.fileStats;
     if (!stats)
         return null;
-    // Top metrics
     const metrics = [
-        { label: 'Total Files', value: formatNumber(stats.totalFiles) },
-        { label: 'Directories', value: formatNumber(stats.totalDirs) },
+        { label: 'Total Files', value: (0, format_1.formatNumber)(stats.totalFiles) },
+        { label: 'Directories', value: (0, format_1.formatNumber)(stats.totalDirs) },
         { label: 'Avg Length', value: `${stats.avgFileLength} lines` },
         { label: 'Median Length', value: `${stats.medianFileLength} lines` },
     ];
     const colWidth = (config.cardWidth - 40) / 2;
     const parts = [];
-    // Metrics grid (2x2)
     for (let i = 0; i < metrics.length; i++) {
         const col = i % 2;
         const row = Math.floor(i / 2);
@@ -35600,7 +35505,6 @@ function renderFileStats(data, config, theme) {
       </g>
     `);
     }
-    // Top file types (up to 6)
     const topExtensions = Object.entries(stats.byExtension)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 6);
@@ -35625,11 +35529,6 @@ function renderFileStats(data, config, theme) {
         body: parts.join(''),
         theme,
     });
-}
-function formatNumber(n) {
-    if (n >= 1000)
-        return `${(n / 1000).toFixed(1)}K`;
-    return n.toLocaleString();
 }
 
 
@@ -35722,6 +35621,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.renderLocSummary = renderLocSummary;
 const template_1 = __nccwpck_require__(2802);
 const charts_1 = __nccwpck_require__(3913);
+const format_1 = __nccwpck_require__(3978);
+function pct(part, total) {
+    if (total === 0)
+        return '0%';
+    return `${Math.round((part / total) * 100)}%`;
+}
 function renderLocSummary(data, config, theme) {
     const loc = data.loc;
     if (!loc)
@@ -35734,18 +35639,18 @@ function renderLocSummary(data, config, theme) {
     ];
     const bar = (0, charts_1.stackedBar)(segments, chartWidth);
     const body = `
-    <text class="card-text" x="0" y="4" font-size="20" font-weight="700" fill="${theme.text}">${formatNumber(loc.total)}</text>
+    <text class="card-text" x="0" y="4" font-size="20" font-weight="700" fill="${theme.text}">${(0, format_1.formatNumber)(loc.total)}</text>
     <text class="card-text-secondary" x="0" y="22">total lines</text>
     <g transform="translate(0, 36)">
       ${bar}
     </g>
     <g transform="translate(0, 60)">
       <circle cx="5" cy="5" r="4" fill="${theme.barColors[0]}" />
-      <text class="card-text-secondary" x="14" y="9">Code ${formatNumber(loc.code)} (${pct(loc.code, loc.total)})</text>
+      <text class="card-text-secondary" x="14" y="9">Code ${(0, format_1.formatNumber)(loc.code)} (${pct(loc.code, loc.total)})</text>
       <circle cx="${chartWidth / 3 + 5}" cy="5" r="4" fill="${theme.barColors[1]}" />
-      <text class="card-text-secondary" x="${chartWidth / 3 + 14}" y="9">Comments ${formatNumber(loc.comments)} (${pct(loc.comments, loc.total)})</text>
+      <text class="card-text-secondary" x="${chartWidth / 3 + 14}" y="9">Comments ${(0, format_1.formatNumber)(loc.comments)} (${pct(loc.comments, loc.total)})</text>
       <circle cx="${(chartWidth / 3) * 2 + 5}" cy="5" r="4" fill="${theme.barColors[2]}" />
-      <text class="card-text-secondary" x="${(chartWidth / 3) * 2 + 14}" y="9">Blank ${formatNumber(loc.blanks)} (${pct(loc.blanks, loc.total)})</text>
+      <text class="card-text-secondary" x="${(chartWidth / 3) * 2 + 14}" y="9">Blank ${(0, format_1.formatNumber)(loc.blanks)} (${pct(loc.blanks, loc.total)})</text>
     </g>
   `;
     return (0, template_1.renderCard)({
@@ -35755,18 +35660,6 @@ function renderLocSummary(data, config, theme) {
         body,
         theme,
     });
-}
-function formatNumber(n) {
-    if (n >= 1000000)
-        return `${(n / 1000000).toFixed(1)}M`;
-    if (n >= 1000)
-        return `${(n / 1000).toFixed(1)}K`;
-    return n.toLocaleString();
-}
-function pct(part, total) {
-    if (total === 0)
-        return '0%';
-    return `${Math.round((part / total) * 100)}%`;
 }
 
 
@@ -35780,17 +35673,18 @@ function pct(part, total) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.renderRepoOverview = renderRepoOverview;
 const template_1 = __nccwpck_require__(2802);
+const format_1 = __nccwpck_require__(3978);
 function renderRepoOverview(data, config, theme) {
     const meta = data.repoMeta;
     if (!meta)
         return null;
     const metrics = [
-        { icon: '\u{1F4C5}', label: 'Age', value: formatAge(meta.ageInDays) },
-        { icon: '\u{1F4DD}', label: 'Commits', value: formatNumber(meta.totalCommits) },
-        { icon: '\u2B50', label: 'Stars', value: formatNumber(meta.stars) },
-        { icon: '\u{1F500}', label: 'Forks', value: formatNumber(meta.forks) },
-        { icon: '\u{1F7E2}', label: 'Issues', value: formatNumber(meta.openIssues) },
-        { icon: '\u{1F504}', label: 'PRs', value: formatNumber(meta.openPRs) },
+        { icon: '\u{1F4C5}', label: 'Age', value: (0, format_1.formatAge)(meta.ageInDays) },
+        { icon: '\u{1F4DD}', label: 'Commits', value: (0, format_1.formatNumber)(meta.totalCommits) },
+        { icon: '\u2B50', label: 'Stars', value: (0, format_1.formatNumber)(meta.stars) },
+        { icon: '\u{1F500}', label: 'Forks', value: (0, format_1.formatNumber)(meta.forks) },
+        { icon: '\u{1F7E2}', label: 'Issues', value: (0, format_1.formatNumber)(meta.openIssues) },
+        { icon: '\u{1F504}', label: 'PRs', value: (0, format_1.formatNumber)(meta.openPRs) },
     ];
     const colWidth = (config.cardWidth - 40) / 3;
     const rowHeight = 50;
@@ -35815,22 +35709,6 @@ function renderRepoOverview(data, config, theme) {
         body: parts.join(''),
         theme,
     });
-}
-function formatAge(days) {
-    if (days < 30)
-        return `${days}d`;
-    if (days < 365)
-        return `${Math.floor(days / 30)}mo`;
-    const years = Math.floor(days / 365);
-    const months = Math.floor((days % 365) / 30);
-    return months > 0 ? `${years}y ${months}mo` : `${years}y`;
-}
-function formatNumber(n) {
-    if (n >= 1000000)
-        return `${(n / 1000000).toFixed(1)}M`;
-    if (n >= 1000)
-        return `${(n / 1000).toFixed(1)}K`;
-    return n.toString();
 }
 
 
@@ -35920,38 +35798,26 @@ exports.gaugeArc = gaugeArc;
 exports.legend = legend;
 exports.heatmapGrid = heatmapGrid;
 const template_1 = __nccwpck_require__(2802);
-// Horizontal stacked bar chart
+let clipIdCounter = 0;
+// Horizontal stacked bar chart — uses clipPath for rounded corners
 function stackedBar(segments, width, height = 12, borderRadius = 4) {
     const total = segments.reduce((sum, s) => sum + s.value, 0);
     if (total === 0)
         return '';
+    const clipId = `bar-clip-${clipIdCounter++}`;
     let x = 0;
     const rects = [];
-    for (let i = 0; i < segments.length; i++) {
-        const w = (segments[i].value / total) * width;
+    for (const seg of segments) {
+        const w = (seg.value / total) * width;
         if (w < 0.5)
             continue;
-        let rx = 0;
-        if (i === 0 || i === segments.length - 1)
-            rx = borderRadius;
-        // For first and last segments, add rounded corners
-        if (segments.length === 1) {
-            rects.push(`<rect x="${x}" y="0" width="${w}" height="${height}" rx="${rx}" fill="${segments[i].color}" />`);
-        }
-        else if (i === 0) {
-            rects.push(`<rect x="${x}" y="0" width="${w + rx}" height="${height}" rx="${rx}" fill="${segments[i].color}" />`);
-            rects.push(`<rect x="${x + w - 1}" y="0" width="${rx + 1}" height="${height}" fill="${segments[i].color}" />`);
-        }
-        else if (i === segments.length - 1) {
-            rects.push(`<rect x="${x - rx}" y="0" width="${w + rx}" height="${height}" rx="${rx}" fill="${segments[i].color}" />`);
-            rects.push(`<rect x="${x}" y="0" width="${rx}" height="${height}" fill="${segments[i].color}" />`);
-        }
-        else {
-            rects.push(`<rect x="${x}" y="0" width="${w}" height="${height}" fill="${segments[i].color}" />`);
-        }
+        rects.push(`<rect x="${x}" y="0" width="${w}" height="${height}" fill="${seg.color}" />`);
         x += w;
     }
-    return `<g>${rects.join('\n')}</g>`;
+    return `<g>
+  <defs><clipPath id="${clipId}"><rect width="${width}" height="${height}" rx="${borderRadius}" /></clipPath></defs>
+  <g clip-path="url(#${clipId})">${rects.join('\n')}</g>
+</g>`;
 }
 // Simple bar chart (vertical bars)
 function barChart(values, width, height, color, gap = 2) {
@@ -36130,7 +35996,9 @@ function renderCard({ title, width, height, body, theme, icon }) {
     const titleBarHeight = 36;
     const padding = 20;
     const totalHeight = height + titleBarHeight + padding;
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${totalHeight}" viewBox="0 0 ${width} ${totalHeight}" fill="none">
+    const titleId = `repostats-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${totalHeight}" viewBox="0 0 ${width} ${totalHeight}" fill="none" role="img" aria-labelledby="${titleId}">
+  <title id="${titleId}">${escapeXml(title)}</title>
   <style>
     .card-bg { fill: ${theme.bg}; }
     .card-border { stroke: ${theme.border}; stroke-width: 1; fill: none; }
@@ -36243,6 +36111,93 @@ exports.CARD_TYPES = [
 
 /***/ }),
 
+/***/ 2795:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.countLines = countLines;
+function countLines(lines, lang) {
+    const result = { code: 0, comments: 0, blanks: 0 };
+    const lineComment = lang?.lineComment;
+    const blockStart = lang?.blockCommentStart;
+    const blockEnd = lang?.blockCommentEnd;
+    let inBlock = false;
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed === '') {
+            result.blanks++;
+            continue;
+        }
+        if (inBlock) {
+            result.comments++;
+            if (blockEnd && trimmed.includes(blockEnd))
+                inBlock = false;
+            continue;
+        }
+        if (blockStart && trimmed.startsWith(blockStart)) {
+            result.comments++;
+            if (blockEnd && !trimmed.includes(blockEnd))
+                inBlock = true;
+            continue;
+        }
+        if (lineComment && trimmed.startsWith(lineComment)) {
+            result.comments++;
+            continue;
+        }
+        result.code++;
+    }
+    return result;
+}
+
+
+/***/ }),
+
+/***/ 3978:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.formatNumber = formatNumber;
+exports.formatAge = formatAge;
+exports.formatTimeAgo = formatTimeAgo;
+function formatNumber(n) {
+    if (n >= 1000000)
+        return `${(n / 1000000).toFixed(1)}M`;
+    if (n >= 1000)
+        return `${(n / 1000).toFixed(1)}K`;
+    return n.toLocaleString();
+}
+function formatAge(days) {
+    if (days < 30)
+        return `${days}d`;
+    if (days < 365)
+        return `${Math.floor(days / 30)}mo`;
+    const years = Math.floor(days / 365);
+    const months = Math.floor((days % 365) / 30);
+    return months > 0 ? `${years}y ${months}mo` : `${years}y`;
+}
+function formatTimeAgo(dateStr) {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 60)
+        return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24)
+        return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 30)
+        return `${diffDays}d ago`;
+    return `${Math.floor(diffDays / 30)}mo ago`;
+}
+
+
+/***/ }),
+
 /***/ 4138:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -36296,8 +36251,22 @@ const BINARY_EXTENSIONS = new Set([
     '.pyc', '.pyo', '.class', '.o', '.obj',
     '.sqlite', '.db',
 ]);
+function compileExcludes(patterns) {
+    const literals = new Set();
+    const globs = [];
+    for (const p of patterns) {
+        if (p.includes('*')) {
+            globs.push(new RegExp('^' + p.replace(/\*/g, '.*') + '$'));
+        }
+        else {
+            literals.add(p);
+        }
+    }
+    return { literals, globs };
+}
 async function walkFiles(rootDir, excludePatterns, maxFiles, visitors) {
     let fileCount = 0;
+    const excludes = compileExcludes(excludePatterns);
     async function walk(dir) {
         if (fileCount >= maxFiles)
             return;
@@ -36313,19 +36282,15 @@ async function walkFiles(rootDir, excludePatterns, maxFiles, visitors) {
                 return;
             const fullPath = path.join(dir, entry.name);
             const relativePath = path.relative(rootDir, fullPath);
-            // Check exclude patterns
-            if (shouldExclude(relativePath, entry.name, excludePatterns)) {
+            if (shouldExclude(relativePath, entry.name, excludes))
                 continue;
-            }
             if (entry.isDirectory()) {
                 await walk(fullPath);
             }
             else if (entry.isFile()) {
                 const ext = path.extname(entry.name).toLowerCase();
-                // Skip binary files
                 if (BINARY_EXTENSIONS.has(ext))
                     continue;
-                // Read file content
                 try {
                     const content = await fs.promises.readFile(fullPath, 'utf-8');
                     const lines = content.split('\n');
@@ -36342,7 +36307,7 @@ async function walkFiles(rootDir, excludePatterns, maxFiles, visitors) {
                     fileCount++;
                 }
                 catch {
-                    // Skip files that can't be read (e.g., binary detected as text)
+                    // Skip unreadable files
                 }
             }
         }
@@ -36350,20 +36315,17 @@ async function walkFiles(rootDir, excludePatterns, maxFiles, visitors) {
     await walk(rootDir);
     core.info(`Walked ${fileCount} files.`);
 }
-function shouldExclude(relativePath, name, patterns) {
-    // Check if any path segment matches an exclude pattern
+function shouldExclude(relativePath, name, excludes) {
+    if (excludes.literals.has(name))
+        return true;
     const segments = relativePath.split(path.sep);
-    for (const pattern of patterns) {
-        if (name === pattern)
+    for (const seg of segments) {
+        if (excludes.literals.has(seg))
             return true;
-        if (segments.includes(pattern))
+    }
+    for (const regex of excludes.globs) {
+        if (regex.test(relativePath) || segments.some(s => regex.test(s)))
             return true;
-        // Simple glob: if pattern has *, do basic wildcard matching
-        if (pattern.includes('*')) {
-            const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
-            if (regex.test(relativePath) || segments.some(s => regex.test(s)))
-                return true;
-        }
     }
     return false;
 }

@@ -1,11 +1,11 @@
 import { CollectedData, RepoStatsConfig, ThemeVars } from '../../types';
 import { renderCard, escapeXml } from '../template';
+import { formatNumber } from '../../utils/format';
 
 export function renderFileStats(data: CollectedData, config: RepoStatsConfig, theme: ThemeVars): string | null {
   const stats = data.fileStats;
   if (!stats) return null;
 
-  // Top metrics
   const metrics = [
     { label: 'Total Files', value: formatNumber(stats.totalFiles) },
     { label: 'Directories', value: formatNumber(stats.totalDirs) },
@@ -16,7 +16,6 @@ export function renderFileStats(data: CollectedData, config: RepoStatsConfig, th
   const colWidth = (config.cardWidth - 40) / 2;
   const parts: string[] = [];
 
-  // Metrics grid (2x2)
   for (let i = 0; i < metrics.length; i++) {
     const col = i % 2;
     const row = Math.floor(i / 2);
@@ -32,7 +31,6 @@ export function renderFileStats(data: CollectedData, config: RepoStatsConfig, th
     `);
   }
 
-  // Top file types (up to 6)
   const topExtensions = Object.entries(stats.byExtension)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 6);
@@ -62,9 +60,4 @@ export function renderFileStats(data: CollectedData, config: RepoStatsConfig, th
     body: parts.join(''),
     theme,
   });
-}
-
-function formatNumber(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return n.toLocaleString();
 }

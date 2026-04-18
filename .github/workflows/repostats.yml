@@ -1,0 +1,29 @@
+name: Repository Stats
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    # Ensure this never blocks other workflows or breaks the repo
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Use the action from this repo itself (local reference)
+      - uses: ./
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          theme: dark
+          cards: all
+          columns: 2

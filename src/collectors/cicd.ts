@@ -1,6 +1,8 @@
 import * as github from '@actions/github';
 import { RepoStatsConfig, WorkflowRun } from '../types';
 
+const MAX_CICD_RUNS = 5;
+
 export async function collectCicdStatus(config: RepoStatsConfig): Promise<WorkflowRun[]> {
   const octokit = github.getOctokit(config.githubToken);
   const { owner, repo } = github.context.repo;
@@ -28,7 +30,7 @@ export async function collectCicdStatus(config: RepoStatsConfig): Promise<Workfl
       url: run.html_url,
     });
 
-    if (runs.length >= 5) break;
+    if (runs.length >= MAX_CICD_RUNS) break;
   }
 
   return runs;

@@ -1,5 +1,6 @@
 import { CollectedData, RepoStatsConfig, ThemeVars } from '../../types';
 import { renderCard, escapeXml } from '../template';
+import { formatTimeAgo } from '../../utils/format';
 
 export function renderCicdStatus(data: CollectedData, config: RepoStatsConfig, theme: ThemeVars): string | null {
   const runs = data.cicdStatus;
@@ -51,18 +52,4 @@ function getStatusColor(conclusion: string | null): string {
     case 'skipped': return '#8b949e';
     default: return '#d29922';
   }
-}
-
-function formatTimeAgo(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-
-  if (diffMins < 60) return `${diffMins}m ago`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 30) return `${diffDays}d ago`;
-  return `${Math.floor(diffDays / 30)}mo ago`;
 }

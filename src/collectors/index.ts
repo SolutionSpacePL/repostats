@@ -3,7 +3,6 @@ import { CollectedData, RepoStatsConfig } from '../types';
 import { collectLoc } from './loc';
 import { collectLanguages } from './languages';
 import { collectFileStats } from './files';
-import { collectCommentRatio } from './comments';
 import { collectTechStack } from './techstack';
 import { collectCommitActivity } from './commits';
 import { collectContributors } from './contributors';

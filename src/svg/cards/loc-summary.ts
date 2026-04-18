@@ -1,6 +1,12 @@
 import { CollectedData, RepoStatsConfig, ThemeVars } from '../../types';
-import { renderCard, escapeXml } from '../template';
+import { renderCard } from '../template';
 import { stackedBar } from '../charts';
+import { formatNumber } from '../../utils/format';
+
+function pct(part: number, total: number): string {
+  if (total === 0) return '0%';
+  return `${Math.round((part / total) * 100)}%`;
+}
 
 export function renderLocSummary(data: CollectedData, config: RepoStatsConfig, theme: ThemeVars): string | null {
   const loc = data.loc;
@@ -38,15 +44,4 @@ export function renderLocSummary(data: CollectedData, config: RepoStatsConfig, t
     body,
     theme,
   });
-}
-
-function formatNumber(n: number): string {
-  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return n.toLocaleString();
-}
-
-function pct(part: number, total: number): string {
-  if (total === 0) return '0%';
-  return `${Math.round((part / total) * 100)}%`;
 }

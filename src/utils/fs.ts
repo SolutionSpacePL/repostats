@@ -25,6 +25,24 @@ const BINARY_EXTENSIONS = new Set([
   '.sqlite', '.db',
 ]);
 
+interface CompiledExcludes {
+  literals: Set<string>;
+  globs: RegExp[];
+}
+
+function compileExcludes(patterns: string[]): CompiledExcludes {
+  const literals = new Set<string>();
+  const globs: RegExp[] = [];
+  for (const p of patterns) {
+    if (p.includes('*')) {
+      globs.push(new RegExp('^' + p.replace(/\*/g, '.*') + '$'));
+    } else {
+      literals.add(p);
+    }
+  }
+  return { literals, globs };
+}
+
 export async function walkFiles(
   rootDir: string,
   excludePatterns: string[],
@@ -32,6 +50,7 @@ export async function walkFiles(
   visitors: FileVisitor[]
 ): Promise<void> {
   let fileCount = 0;
+  const excludes = compileExcludes(excludePatterns);
 
   async function walk(dir: string): Promise<void> {
     if (fileCount >= maxFiles) return;
@@ -49,20 +68,14 @@ export async function walkFiles(
       const fullPath = path.join(dir, entry.name);
       const relativePath = path.relative(rootDir, fullPath);
 
-      // Check exclude patterns
-      if (shouldExclude(relativePath, entry.name, excludePatterns)) {
-        continue;
-      }
+      if (shouldExclude(relativePath, entry.name, excludes)) continue;
 
       if (entry.isDirectory()) {
         await walk(fullPath);
       } else if (entry.isFile()) {
         const ext = path.extname(entry.name).toLowerCase();
-
-        // Skip binary files
         if (BINARY_EXTENSIONS.has(ext)) continue;
 
-        // Read file content
         try {
           const content = await fs.promises.readFile(fullPath, 'utf-8');
           const lines = content.split('\n');
@@ -80,7 +93,7 @@ export async function walkFiles(
 
           fileCount++;
         } catch {
-          // Skip files that can't be read (e.g., binary detected as text)
+          // Skip unreadable files
         }
       }
     }
@@ -90,17 +103,17 @@ export async function walkFiles(
   core.info(`Walked ${fileCount} files.`);
 }
 
-function shouldExclude(relativePath: string, name: string, patterns: string[]): boolean {
-  // Check if any path segment matches an exclude pattern
+function shouldExclude(relativePath: string, name: string, excludes: CompiledExcludes): boolean {
+  if (excludes.literals.has(name)) return true;
+
   const segments = relativePath.split(path.sep);
-  for (const pattern of patterns) {
-    if (name === pattern) return true;
-    if (segments.includes(pattern)) return true;
-    // Simple glob: if pattern has *, do basic wildcard matching
-    if (pattern.includes('*')) {
-      const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
-      if (regex.test(relativePath) || segments.some(s => regex.test(s))) return true;
-    }
+  for (const seg of segments) {
+    if (excludes.literals.has(seg)) return true;
   }
+
+  for (const regex of excludes.globs) {
+    if (regex.test(relativePath) || segments.some(s => regex.test(s))) return true;
+  }
+
   return false;
 }

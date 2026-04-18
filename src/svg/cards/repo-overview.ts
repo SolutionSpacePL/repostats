@@ -1,5 +1,6 @@
 import { CollectedData, RepoStatsConfig, ThemeVars } from '../../types';
 import { renderCard, escapeXml } from '../template';
+import { formatNumber, formatAge } from '../../utils/format';
 
 export function renderRepoOverview(data: CollectedData, config: RepoStatsConfig, theme: ThemeVars): string | null {
   const meta = data.repoMeta;
@@ -40,18 +41,4 @@ export function renderRepoOverview(data: CollectedData, config: RepoStatsConfig,
     body: parts.join(''),
     theme,
   });
-}
-
-function formatAge(days: number): string {
-  if (days < 30) return `${days}d`;
-  if (days < 365) return `${Math.floor(days / 30)}mo`;
-  const years = Math.floor(days / 365);
-  const months = Math.floor((days % 365) / 30);
-  return months > 0 ? `${years}y ${months}mo` : `${years}y`;
-}
-
-function formatNumber(n: number): string {
-  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return n.toString();
 }

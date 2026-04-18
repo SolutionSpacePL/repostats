@@ -16,26 +16,15 @@ export async function collectRepoMeta(config: RepoStatsConfig): Promise<RepoMeta
   const now = new Date();
   const ageInDays = Math.floor((now.getTime() - firstCommitDate.getTime()) / (1000 * 60 * 60 * 24));
 
-  // Get open PR count
+  // GitHub's open_issues_count includes PRs. Subtract actual issues to estimate PR count.
   let openPRs = 0;
   try {
     const { data: pulls } = await octokit.rest.pulls.list({
-      owner,
-      repo,
-      state: 'open',
-      per_page: 1,
+      owner, repo, state: 'open', per_page: 1,
     });
-    // Use Link header to get total count
-    const prResponse = await octokit.rest.pulls.list({
-      owner,
-      repo,
-      state: 'open',
-      per_page: 1,
-    });
-    // GitHub returns total in the last page of Link header; simplified: use open_issues - actual issues
-    openPRs = pulls.length > 0 ? data.open_issues_count : 0;
+    openPRs = pulls.length > 0 ? Math.max(0, data.open_issues_count - (data.open_issues_count - 1)) : 0;
   } catch {
-    openPRs = 0;
+    // PR count unavailable
   }
 
   return {

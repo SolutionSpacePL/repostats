@@ -1,6 +1,7 @@
 import { CollectedData, RepoStatsConfig, ThemeVars } from '../../types';
 import { renderCard, escapeXml } from '../template';
 import { gaugeArc } from '../charts';
+import { formatNumber } from '../../utils/format';
 
 export function renderCommentRatio(data: CollectedData, config: RepoStatsConfig, theme: ThemeVars): string | null {
   const ratio = data.commentRatio;
@@ -31,9 +32,4 @@ export function renderCommentRatio(data: CollectedData, config: RepoStatsConfig,
     body,
     theme,
   });
-}
-
-function formatNumber(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return n.toLocaleString();
 }

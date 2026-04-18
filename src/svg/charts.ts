@@ -1,6 +1,8 @@
 import { escapeXml } from './template';
 
-// Horizontal stacked bar chart
+let clipIdCounter = 0;
+
+// Horizontal stacked bar chart — uses clipPath for rounded corners
 export function stackedBar(
   segments: { label: string; value: number; color: string }[],
   width: number,
@@ -10,32 +12,21 @@ export function stackedBar(
   const total = segments.reduce((sum, s) => sum + s.value, 0);
   if (total === 0) return '';
 
+  const clipId = `bar-clip-${clipIdCounter++}`;
   let x = 0;
   const rects: string[] = [];
 
-  for (let i = 0; i < segments.length; i++) {
-    const w = (segments[i].value / total) * width;
+  for (const seg of segments) {
+    const w = (seg.value / total) * width;
     if (w < 0.5) continue;
-
-    let rx = 0;
-    if (i === 0 || i === segments.length - 1) rx = borderRadius;
-
-    // For first and last segments, add rounded corners
-    if (segments.length === 1) {
-      rects.push(`<rect x="${x}" y="0" width="${w}" height="${height}" rx="${rx}" fill="${segments[i].color}" />`);
-    } else if (i === 0) {
-      rects.push(`<rect x="${x}" y="0" width="${w + rx}" height="${height}" rx="${rx}" fill="${segments[i].color}" />`);
-      rects.push(`<rect x="${x + w - 1}" y="0" width="${rx + 1}" height="${height}" fill="${segments[i].color}" />`);
-    } else if (i === segments.length - 1) {
-      rects.push(`<rect x="${x - rx}" y="0" width="${w + rx}" height="${height}" rx="${rx}" fill="${segments[i].color}" />`);
-      rects.push(`<rect x="${x}" y="0" width="${rx}" height="${height}" fill="${segments[i].color}" />`);
-    } else {
-      rects.push(`<rect x="${x}" y="0" width="${w}" height="${height}" fill="${segments[i].color}" />`);
-    }
+    rects.push(`<rect x="${x}" y="0" width="${w}" height="${height}" fill="${seg.color}" />`);
     x += w;
   }
 
-  return `<g>${rects.join('\n')}</g>`;
+  return `<g>
+  <defs><clipPath id="${clipId}"><rect width="${width}" height="${height}" rx="${borderRadius}" /></clipPath></defs>
+  <g clip-path="url(#${clipId})">${rects.join('\n')}</g>
+</g>`;
 }
 
 // Simple bar chart (vertical bars)
