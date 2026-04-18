@@ -34289,7 +34289,7 @@ function createVisitor() {
     return {
         visit(file) {
             fileLengths.push(file.lineCount);
-            const ext = file.extension || '(no ext)';
+            const ext = file.extension || 'other';
             extensionCounts.set(ext, (extensionCounts.get(ext) ?? 0) + 1);
             largestFiles.push({ path: file.relativePath, lines: file.lineCount });
             const dir = file.relativePath.split('/').slice(0, -1).join('/');
@@ -34942,7 +34942,7 @@ const DEFAULTS = {
     theme: 'dark',
     outputDir: '.repostats',
     readmePath: 'README.md',
-    exclude: ['node_modules', 'vendor', '.git', 'dist', 'build'],
+    exclude: ['node_modules', 'vendor', '.git', 'dist', 'build', 'package-lock.json', '.repostats'],
     maxFiles: 50000,
     cardWidth: 495,
     columns: 2,
@@ -36406,10 +36406,15 @@ async function getMostChangedFiles(limit = 10) {
         '--diff-filter=ACMR',
         '-n', '500',
     ]);
+    const IGNORED_PREFIXES = ['dist/', 'build/', 'node_modules/', '.repostats/'];
     const counts = new Map();
     for (const line of output.split('\n')) {
         const file = line.trim();
         if (!file)
+            continue;
+        if (IGNORED_PREFIXES.some(p => file.startsWith(p)))
+            continue;
+        if (file === 'package-lock.json')
             continue;
         counts.set(file, (counts.get(file) || 0) + 1);
     }

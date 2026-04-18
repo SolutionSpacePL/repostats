@@ -8,7 +8,7 @@ const DEFAULTS: RepoStatsConfig = {
   theme: 'dark',
   outputDir: '.repostats',
   readmePath: 'README.md',
-  exclude: ['node_modules', 'vendor', '.git', 'dist', 'build'],
+  exclude: ['node_modules', 'vendor', '.git', 'dist', 'build', 'package-lock.json', '.repostats'],
   maxFiles: 50000,
   cardWidth: 495,
   columns: 2,

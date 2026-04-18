@@ -24,7 +24,7 @@ function createVisitor(): FileVisitor {
     visit(file: FileInfo): void {
       fileLengths.push(file.lineCount);
 
-      const ext = file.extension || '(no ext)';
+      const ext = file.extension || 'other';
       extensionCounts.set(ext, (extensionCounts.get(ext) ?? 0) + 1);
 
       largestFiles.push({ path: file.relativePath, lines: file.lineCount });

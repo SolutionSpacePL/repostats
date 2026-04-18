@@ -33,10 +33,14 @@ export async function getMostChangedFiles(limit: number = 10): Promise<{ path: s
     '-n', '500',
   ]);
 
+  const IGNORED_PREFIXES = ['dist/', 'build/', 'node_modules/', '.repostats/'];
+
   const counts = new Map<string, number>();
   for (const line of output.split('\n')) {
     const file = line.trim();
     if (!file) continue;
+    if (IGNORED_PREFIXES.some(p => file.startsWith(p))) continue;
+    if (file === 'package-lock.json') continue;
     counts.set(file, (counts.get(file) || 0) + 1);
   }
 

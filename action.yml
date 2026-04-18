@@ -32,7 +32,7 @@ inputs:
   exclude:
     description: 'Comma-separated glob patterns to exclude from file analysis'
     required: false
-    default: 'node_modules,vendor,.git,dist,build'
+    default: 'node_modules,vendor,.git,dist,build,package-lock.json,.repostats'
   max_files:
     description: 'Maximum files to analyze (safety valve for large repos)'
     required: false
