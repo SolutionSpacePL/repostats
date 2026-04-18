@@ -1,0 +1,47 @@
+name: 'RepoStats'
+description: 'Generate beautiful SVG cards with comprehensive repository statistics'
+branding:
+  icon: 'bar-chart-2'
+  color: 'blue'
+
+inputs:
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  cards:
+    description: 'Comma-separated list of cards to generate (or "all")'
+    required: false
+    default: 'all'
+  theme:
+    description: 'Theme: dark, light, dimmed, high-contrast'
+    required: false
+    default: 'dark'
+  output_dir:
+    description: 'Directory for generated SVG files'
+    required: false
+    default: '.repostats'
+  readme_path:
+    description: 'Path to README file to update'
+    required: false
+    default: 'README.md'
+  config_file:
+    description: 'Path to .repostats.yml config file'
+    required: false
+    default: '.repostats.yml'
+  exclude:
+    description: 'Comma-separated glob patterns to exclude from file analysis'
+    required: false
+    default: 'node_modules,vendor,.git,dist,build'
+  max_files:
+    description: 'Maximum files to analyze (safety valve for large repos)'
+    required: false
+    default: '50000'
+  columns:
+    description: 'Number of columns in README layout (1 or 2)'
+    required: false
+    default: '2'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

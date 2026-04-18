@@ -1,0 +1,52 @@
+# .repostats.yml — optional configuration file
+# Place this in the root of your repository
+
+# Which cards to generate (default: all)
+cards:
+  - repo-overview
+  - commit-activity
+  - contributors
+  - cicd-status
+  - license
+  - loc-summary
+  - language-breakdown
+  - tech-stack
+  - file-stats
+  - comment-ratio
+  - active-files
+
+# Theme: dark, light, dimmed, high-contrast (default: dark)
+theme: dark
+
+# Custom theme overrides (optional)
+# custom_theme:
+#   bg: '#1a1b27'
+#   text: '#a9b1d6'
+#   accent: '#7aa2f7'
+#   border: '#3b4261'
+
+# Output directory for SVG files (default: .repostats)
+output_dir: .repostats
+
+# Path to README file (default: README.md)
+readme_path: README.md
+
+# Number of columns in README layout (default: 2)
+columns: 2
+
+# Glob patterns to exclude from file analysis
+exclude:
+  - node_modules
+  - vendor
+  - .git
+  - dist
+  - build
+  - __pycache__
+
+# Maximum files to analyze (default: 50000)
+max_files: 50000
+
+# Git commit settings
+commit_message: 'docs: update repository statistics [skip ci]'
+commit_name: 'repostats[bot]'
+commit_email: 'repostats[bot]@users.noreply.github.com'
