@@ -19,7 +19,7 @@
     <g transform="translate(177.5, 0)">
       <g>
     <path d="M 18.180194846605353 81.81980515339464 A 45 45 0 1 1 81.81980515339464 81.81980515339464" fill="none" stroke="#30363d" stroke-width="10" stroke-linecap="round" />
-    <path d="M 18.180194846605353 81.81980515339464 A 45 45 0 0 1 13.763410494123121 76.68163377648703" fill="none" stroke="#f85149" stroke-width="10" stroke-linecap="round" />
+    <path d="M 18.180194846605353 81.81980515339464 A 45 45 0 0 1 13.761598396494648 76.67917257380859" fill="none" stroke="#f85149" stroke-width="10" stroke-linecap="round" />
   </g>
       <text x="50" y="55" text-anchor="middle" font-family="'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700" fill="#c9d1d9">3%</text>
       <text x="50" y="72" text-anchor="middle" font-family="'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif" font-size="10" fill="#8b949e">Sparse</text>
