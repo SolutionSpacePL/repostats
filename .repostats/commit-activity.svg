@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="495" height="166" viewBox="0 0 495 166" fill="none" role="img" aria-labelledby="repostats-commit-activity">
+  <title id="repostats-commit-activity">Commit Activity</title>
+  <style>
+    .card-bg { fill: #0d1117; }
+    .card-border { stroke: #30363d; stroke-width: 1; fill: none; }
+    .card-title { font: 600 14px 'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif; fill: #c9d1d9; }
+    .card-text { font: 400 12px 'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif; fill: #c9d1d9; }
+    .card-text-secondary { font: 400 11px 'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif; fill: #8b949e; }
+    .card-accent { fill: #58a6ff; }
+    .card-footer { font: 400 9px 'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif; fill: #8b949e; }
+  </style>
+  <rect class="card-bg card-border" x="0.5" y="0.5" width="494" height="165" rx="6" />
+  <g transform="translate(20, 24)">
+    <text class="card-title" x="0" y="0">Commit Activity</text>
+  </g>
+  <line x1="20" y1="36" x2="475" y2="36" stroke="#30363d" stroke-width="0.5" />
+  <g transform="translate(20, 48)">
+    
+    <text class="card-text-secondary" x="0" y="0">Last 52 weeks • 12 commits • ~0/week</text>
+    <g transform="translate(0, 16)">
+      <g><rect x="0" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="8.788461538461538" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="17.576923076923077" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="26.365384615384613" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="35.15384615384615" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="43.94230769230769" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="52.730769230769226" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="61.51923076923077" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="70.3076923076923" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="79.09615384615384" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="87.88461538461539" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="96.67307692307692" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="105.46153846153845" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="114.25" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="123.03846153846153" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="131.82692307692307" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="140.6153846153846" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="149.40384615384616" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="158.19230769230768" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="166.98076923076923" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="175.76923076923077" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="184.5576923076923" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="193.34615384615384" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="202.1346153846154" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="210.9230769230769" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="219.71153846153845" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="228.5" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="237.28846153846155" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="246.07692307692307" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="254.8653846153846" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="263.65384615384613" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="272.4423076923077" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="281.2307692307692" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="290.0192307692308" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="298.8076923076923" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="307.59615384615387" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="316.38461538461536" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="325.1730769230769" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="333.96153846153845" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="342.75" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="351.53846153846155" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="360.3269230769231" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="369.1153846153846" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
+<rect x="377.90384615384613" y="0" width="6.788461538461538" height="80" rx="1" fill="#58a6ff" opacity="1" />
+<rect x="386.6923076923077" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
+<rect x="395.4807692307692" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
+<rect x="404.2692307692308" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
+<rect x="413.0576923076923" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
+<rect x="421.8461538461538" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
+<rect x="430.63461538461536" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
+<rect x="439.4230769230769" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
+<rect x="448.21153846153845" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" /></g>
+    </g>
+  
+  </g>
+  <text class="card-footer" x="475" y="160" text-anchor="end">Generated by RepoStats</text>
+</svg>
