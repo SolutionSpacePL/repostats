@@ -16,7 +16,7 @@
   <line x1="20" y1="36" x2="475" y2="36" stroke="#30363d" stroke-width="0.5" />
   <g transform="translate(20, 48)">
     
-    <text class="card-text-secondary" x="0" y="0">Last 52 weeks • 12 commits • ~0/week</text>
+    <text class="card-text-secondary" x="0" y="0">Last 52 weeks • 13 commits • ~0/week</text>
     <g transform="translate(0, 16)">
       <g><rect x="0" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
 <rect x="8.788461538461538" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
@@ -60,8 +60,8 @@
 <rect x="342.75" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
 <rect x="351.53846153846155" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
 <rect x="360.3269230769231" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
-<rect x="369.1153846153846" y="79" width="6.788461538461538" height="1" rx="1" fill="#58a6ff" opacity="0.4" />
-<rect x="377.90384615384613" y="0" width="6.788461538461538" height="80" rx="1" fill="#58a6ff" opacity="1" />
+<rect x="369.1153846153846" y="0" width="6.788461538461538" height="80" rx="1" fill="#58a6ff" opacity="1" />
+<rect x="377.90384615384613" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
 <rect x="386.6923076923077" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
 <rect x="395.4807692307692" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
 <rect x="404.2692307692308" y="64" width="6.788461538461538" height="16" rx="1" fill="#58a6ff" opacity="0.52" />
