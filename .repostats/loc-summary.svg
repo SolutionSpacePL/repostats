@@ -21,14 +21,14 @@
     <g transform="translate(0, 36)">
       <g>
   <defs><clipPath id="bar-clip-0"><rect width="455" height="12" rx="4" /></clipPath></defs>
-  <g clip-path="url(#bar-clip-0)"><rect x="0" y="0" width="371.59772296015177" height="12" fill="#58a6ff" />
-<rect x="371.59772296015177" y="0" width="12.259962049335863" height="12" fill="#3fb950" />
-<rect x="383.8576850094876" y="0" width="71.14231499051233" height="12" fill="#d29922" /></g>
+  <g clip-path="url(#bar-clip-0)"><rect x="0" y="0" width="371.5026595744681" height="12" fill="#58a6ff" />
+<rect x="371.5026595744681" y="0" width="12.273936170212766" height="12" fill="#3fb950" />
+<rect x="383.7765957446809" y="0" width="71.22340425531915" height="12" fill="#d29922" /></g>
 </g>
     </g>
     <g transform="translate(0, 60)">
       <circle cx="5" cy="5" r="4" fill="#58a6ff" />
-      <text class="card-text-secondary" x="14" y="9">Code 2.2K (82%)</text>
+      <text class="card-text-secondary" x="14" y="9">Code 2.1K (82%)</text>
       <circle cx="156.66666666666666" cy="5" r="4" fill="#3fb950" />
       <text class="card-text-secondary" x="165.66666666666666" y="9">Comments 71 (3%)</text>
       <circle cx="308.3333333333333" cy="5" r="4" fill="#d29922" />
